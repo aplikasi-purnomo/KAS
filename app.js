@@ -377,16 +377,23 @@ async function lunasiItem(id) {
 
 /* ---------- Rendering ---------- */
 
+const compactChip = window.matchMedia('(max-width: 480px)');
+
 const MODE_INFO = {
-  loading: { text: 'Memuat…', cls: '' },
-  sheet: { text: 'Terhubung Google Sheet', cls: 'chip--live' },
-  demo: { text: 'Mode demo', cls: 'chip--demo' },
-  offline: { text: 'Luring', cls: 'chip--error' },
+  loading: { text: 'Memuat…', short: 'Memuat…', cls: '' },
+  sheet: { text: 'Terhubung Google Sheet', short: 'Google Sheet', cls: 'chip--live' },
+  demo: { text: 'Mode demo', short: 'Demo', cls: 'chip--demo' },
+  offline: { text: 'Luring', short: 'Luring', cls: 'chip--error' },
 };
+
+function chipLabel() {
+  const info = MODE_INFO[state.mode] || MODE_INFO.loading;
+  return compactChip.matches ? info.short : info.text;
+}
 
 function render() {
   const info = MODE_INFO[state.mode] || MODE_INFO.loading;
-  el.chip.textContent = info.text;
+  el.chip.textContent = chipLabel();
   el.chip.className = 'chip' + (info.cls ? ' ' + info.cls : '');
   el.chip.title =
     state.mode === 'sheet'
@@ -746,6 +753,7 @@ function openPreview(url) {
   if (!safe) return;
   el.previewImg.src = safe;
   el.previewLink.href = safe;
+  el.previewLink.hidden = safe.startsWith('data:');
   el.previewDialog.showModal();
 }
 
@@ -823,6 +831,12 @@ function bindEvents() {
   el.previewDialog.addEventListener('close', () => {
     el.previewImg.removeAttribute('src');
   });
+
+  const refreshChip = () => {
+    el.chip.textContent = chipLabel();
+  };
+  if (compactChip.addEventListener) compactChip.addEventListener('change', refreshChip);
+  else if (compactChip.addListener) compactChip.addListener(refreshChip);
 }
 
 /* ---------- Init ---------- */
