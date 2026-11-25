@@ -873,6 +873,11 @@ tbody tr.is-hidden {
     padding: 16px 16px 0;
   }
 
+  .topbar__inner {
+    flex-wrap: wrap;
+    row-gap: 10px;
+  }
+
   .page {
     padding: 16px 16px 44px;
   }
